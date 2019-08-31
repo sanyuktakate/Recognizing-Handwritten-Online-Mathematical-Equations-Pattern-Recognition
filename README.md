@@ -2,7 +2,7 @@
 
 This is a Handwritten Online Mathematical Equation recognizer. 
 
-This system is divided into three parts classifications, segmentation and parsing the mathematical symbols. 
+This system is divided into three parts classification, segmentation and parsing the mathematical symbols. 
 
 Data:
 The dataset is the CHROME dataset 2014 with online handwritten mathematical equaltions. 
