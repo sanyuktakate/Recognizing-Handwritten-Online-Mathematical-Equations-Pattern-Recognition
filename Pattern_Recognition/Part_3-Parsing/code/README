@@ -1,0 +1,102 @@
+Authors: Sanyukta Kate (ssk8153), Pratik Bongale(psb4346)
+
+====================================================
+1. Splitting data
+====================================================
+Syntax:
+$ python splitter.py <symbols-dir>
+
+    <symbols-dir>       : directory path where .inkml files can be found
+
+Description:
+    Splits the input data into train (2/3) and test (1/3) datasets. The input directory can be a parent directory storing subdirectories which have inkml files. The program recursively searches for .inkml files in the provided root directory.
+
+Example:
+$ python splitter.py /abs/path/to/TrainINKML
+
+output:
+    creates two files "training_files.txt" and "test_files.txt". Each file contains a list of filenames of .inkml files in respective categories.
+
+====================================================
+3. Training Parser (Spatial Relationship classifier)
+====================================================
+
+Syntax:
+$ python train_parser.py <model-name> <out_fname> <inkml-dir-path> <lg-dir-path> <training_fname>
+
+    <model-name>        : name of the algorithm you want to use for training - provide "rf" (random forest)
+    <out_fname>         : output model pickle file name: model_<out_fname>.pklz
+    <inkml-dir-path>    : absolute path to the directory where the .inkml files are stored(it can be a root directory)
+    <lg-dir-path>       : directory path of .lg ground truth files for files listed in training_fname
+    <training_fname>    : file containing a list of .inkml file names on which you wish to train the segmenter
+
+Description:
+    Trains a spatial relationship classifier to analyze pair of symbols and determine how they are spatially connected in a Symbol Layout Tree
+
+Example:
+3.1 Train a random forest classifier as parser
+$python train_parser.py rf parser /abs/path/to/TrainINKML /abs/path/to/gt_lg training_files.txt
+
+Output: Creates a pickle file named "rf_<out_fname>.pklz" for trained parser model.
+        example: rf_parser.pklz
+
+====================================================
+4. Testing Symbol Parser
+====================================================
+
+Syntax:
+$ python run_symb_parser.py <parser-pkl> <output-dir-name> <test-files-dir> <test-file(s)>
+
+    <parser-pkl>        : pickle filename of trained parser model
+    <output-dir-name>   : directory name for output lg files (directory will be created if it does'nt exist)
+    <test-files-dir>    : The absolute path to the directory where the test files are stored(it can be a root directory)
+    <test-file(s)>      : A ".inkml" file or a ".txt" file containing a list of .inkml file names on which you wish to test.
+
+Description:
+    Tests the given input file(s) on the trained parser to parse segmented expressions and extracts a symbol layout tree defining relationships between symbols.
+    Please note that the extension of filename provided for the last parameter <test-file(s)> is ".inkml" if you want to test a single file.
+
+Example:
+4.1) To run a single .inkml file
+$ python run_symb_parser.py rf_parser.pklz /abs/path/to/TrainINKML 2_em_3.inkml
+
+4.2) To run a multiple .inkml file
+$ python run_symb_parser.py rf_parser.pklz /abs/path/to/TrainINKML test_files.txt
+
+Output:
+    Creates a directory "output_lg_<output-dir-name>" and places all the label graph(.lg) output files as <input_file_name>.lg for each file in the test_files.txt.
+
+====================================================
+5. Testing Strokes Parser
+====================================================
+
+Syntax:
+$ python run_strokes_parser.py <parser-pkl> <segmenter-pkl> <sym-clf-pkl> <output-dir-name> <test-files-dir> <test-file(s)>
+
+    <parser-pkl>        : pickle filename of trained parser model
+    <segmenter-pkl>     : pickle filename of trained segmenter model
+    <classifier-pkl>    : pickle filename of trained symbol classifier model
+    <output-dir-name>   : directory name for output lg files (directory will be created if it does'nt exist)
+    <test-files-dir>    : The absolute path to the directory where the test files are stored(it can be a root directory)
+    <test-file(s)>      : A ".inkml" file or a ".txt" file containing a list of .inkml file names on which you wish to test.
+
+Description:
+    Tests the given input file(s) on the trained parser model to parse strokes, identify segments/symbols and extract a symbol layout tree defining relationships between symbols.
+    Please note that the extension of filename provided for the last parameter <test-file(s)> is ".inkml" if you want to test a single file.
+
+Example:
+4.1) To run a single .inkml file
+$ python run_symb_parser.py rf_parser.pklz rf_segmenter.pklz rf_symb_classifier.pklz /abs/path/to/TrainINKML 2_em_3.inkml
+
+4.2) To run a multiple .inkml file
+$ python run_symb_parser.py rf_parser.pklz rf_segmenter.pklz rf_symb_classifier.pklz /abs/path/to/TrainINKML test_files.txt
+
+Output:
+    Creates a directory "output_lg_<output-dir-name>" and places all the label graph(.lg) output files as <input_file_name>.lg for each file in the test_files.txt.
+
+====================================================
+6. Comments
+====================================================
+Note:
+1. Code has been tested in python version 3.6
+2. Packages used: numpy, scikit-learn
