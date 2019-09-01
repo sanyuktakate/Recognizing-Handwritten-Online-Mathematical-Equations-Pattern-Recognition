@@ -1,0 +1,72 @@
+Authors: Sanyukta Kate (ssk8153), Pratik Bongale(psb4346)
+
+==========================================
+1. Splitting data
+==========================================
+Syntax:
+$ python splitter.py <symbols-dir>
+
+    <symbols-dir>       : directory path where .inkml files can be found
+
+Description:
+    Splits the input data into train (2/3) and test (1/3) datasets. The input directory can be a parent directory storing subdirectories which have inkml files. The program recursively searches for .inkml files in the provided root directory.
+
+Example:
+$ python splitter.py /abs/path/to/TrainINKML
+
+output:
+    creates two files "training_files.txt" and "test_files.txt". Each file contains a list of filenames of .inkml files in respective categories.
+
+==========================================
+3. Training Model
+==========================================
+
+Syntax:
+$ python train_segmenter.py <model-name> <keyword> <dir-path> <training-files>
+
+    <model-name>        : The name of the algorithm you want to use for training - provide "rf" (random forest)
+    <keyword>           : A keyword(used in output filenames) for identifying your output segmenter model's pickle file.
+    <dir-path>          : The absolute path to the directory where the .inkml files are stored(it can be a root directory)
+    <symbols-to-train>  : file containing a list of .inkml file names on which you wish to train the segmenter
+
+Description:
+    Trains a binary segmenter to analyze two consecutive strokes and tell whether they form a symbol object or not.
+
+Example:
+3.1 Train the random forest segmenter
+$python train_segmenter.py rf segmenter /abs/path/to/TrainINKML training_files.txt
+
+Output: Creates a pickle file named "rf_<keyword>.pklz" for trained segmenter model.
+        example: rf_segmenter.pklz
+
+==========================================
+4. Testing Model
+==========================================
+
+Syntax:
+$ python run_segmenter.py <segmentor-pkl> <classifier-pkl> <dir-path> <test-file(s)>
+
+    <segmentor-pkl>     : Pickle file of trained binary segmenter model
+    <classifier-pkl>    : pickle file of trained symbol classifier model
+    <dir-path>          : The absolute path to the directory where the test files are stored(it can be a root directory)
+    <test-file(s)>      : A ".inkml" file or a ".txt" file containing a list of .inkml file names on which you wish to test.
+
+Description:
+    Tests the given input file(s) on the trained segmenter to segment expressions into symbols and uses the trained classifier to classify the individual symbols. Please note that the extension of file-name provided for the last parameter <test-file(s)> is ".inkml" if you want to test a single file.
+
+Example:
+4.1) To run a single .inkml file
+$ python run_segmenter.py rf_segmenter.pklz rf_symb_classifier.pklz /abs/path/to/TrainINKML 2_em_3.inkml
+
+4.2) To run a multiple .inkml file
+$ python run_segmenter.py rf_segmenter.pklz rf_symb_classifier.pklz /abs/path/to/TrainINKML test_files.txt
+
+Output:
+    Creates a directory names "output_lg" and places all the label graph(.lg) output files named as <input_file_name>.lg for each file in the test_files.txt.
+
+==========================================
+5. Comments
+==========================================
+Note:
+1. Code has been tested in python version 3.6
+2. Packages used: numpy, scikit-learn
